@@ -24,6 +24,18 @@ function doAddDepartment() {
 // TODO: Create a function to initialize app
 function init() {
 
+    // Connect to database
+    const db = mysql.createConnection(
+        {
+        host: 'localhost',
+        // MySQL username,
+        user: 'root',
+        // MySQL password
+        password: '',
+        database: 'classlist_db'
+        },
+        console.log(`Connected to the classlist_db database.`)
+    );    
     inquirer
     .prompt(mainQuestion)
     .then(data => {

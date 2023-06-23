@@ -43,6 +43,21 @@ function viewAllDepartment() {
     });
 }
 
+function viewAllRole() {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT roles.id, roles.title, roles.salary, departments.name
+                     FROM roles, departments
+                     WHERE department_id = departments.id;`
+        db.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+                console.table(results);
+                resolve();
+            }
+        });
+    });
+}
 
 // TODO: Create a function to initialize app
 function init() {
@@ -55,7 +70,9 @@ function init() {
             case 'View All Departments':
                 nextAction = viewAllDepartment();    
                 break;
-            //case 'View All Roles':
+            case 'View All Roles':
+                nextAction = viewAllRole();    
+                break;
             //case 'View All Employees':
 
             case 'Add Department':

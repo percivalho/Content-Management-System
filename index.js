@@ -1,7 +1,20 @@
 // TODO: Include packages needed for this application
 const inquirer = require('inquirer');
+const mysql = require('mysql2');
 const  {mainQuestion, addDepartmentQuestion, addRoleQuestion, addEmployeeQuestion, updateEmployeeQuestion} = require('./questions.js');
 
+// Connect to database
+const db = mysql.createConnection(
+    {
+    host: 'localhost',
+    // MySQL username,
+    user: 'root',
+    // MySQL password
+    password: '',
+    database: 'company_db'
+    },
+    console.log(`Connected to the company_db database.`)
+);    
 
 
 function doAddDepartment() {
@@ -17,31 +30,31 @@ function doAddDepartment() {
     })
     
 }
-
-
+function viewAllDepartment() {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM departments', function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+                console.table(results);
+                resolve();
+            }
+        });
+    });
+}
 
 
 // TODO: Create a function to initialize app
 function init() {
 
-    // Connect to database
-    const db = mysql.createConnection(
-        {
-        host: 'localhost',
-        // MySQL username,
-        user: 'root',
-        // MySQL password
-        password: '',
-        database: 'classlist_db'
-        },
-        console.log(`Connected to the classlist_db database.`)
-    );    
     inquirer
     .prompt(mainQuestion)
     .then(data => {
+        let nextAction;
         switch (data.mainquestion){
-            //case 'View All Departments':
-                
+            case 'View All Departments':
+                nextAction = viewAllDepartment();    
+                break;
             //case 'View All Roles':
             //case 'View All Employees':
 
@@ -55,6 +68,9 @@ function init() {
             case 'Quit':
                 break;
         }
+        if (nextAction) {
+            nextAction.then(init); // Call init() again once the selected operation is done
+        }        
     })
 }
 

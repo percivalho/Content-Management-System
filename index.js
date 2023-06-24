@@ -65,6 +65,8 @@ function viewAllRole() {
     });
 }
 
+
+
 function viewAllEmployee() {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM 
@@ -89,6 +91,59 @@ function viewAllEmployee() {
     });
 }
 
+function doAddRole() {
+    // Fetch departments from the database
+    db.query('SELECT * FROM departments', function(err, departments) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }
+        console.log(departments);
+        let ids = departments.map(item => item.id);
+        let names = departments.map(item => item.name);
+        addRoleQuestion[2].choices = names;
+
+        // Now, run the prompt with the updated questions
+        inquirer.prompt(addRoleQuestion)
+        .then(data => {
+            console.log(data);
+            data.roledepartment
+            let index = names.indexOf(data.roledepartment);
+            //console.log(ids[index]);
+            // insert the new role to database here.
+            const sql = `INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)`;
+            const params = [data.rolename, data.rolesalary, ids[index]];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(`Added ${data.rolename} to the roles table.`);
+                    init();
+                }
+            });
+        });
+    });
+}
+
+
+
+/*function doAddRole() {
+    inquirer.prompt(addRoleQuestion)
+    .then(data => {
+        const sql = `INSERT INTO departments (name) VALUES (?)`;
+        const params = [data.departmentname];
+
+        db.query(sql, params, function (err, results) {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log(`Added ${data.departmentname} to the departments table.`);
+                init();
+            }
+        });
+    });
+}*/
 
 
 // TODO: Create a function to initialize app
@@ -112,6 +167,8 @@ function init() {
                 doAddDepartment();
                 break;
             case 'Add Role':
+                doAddRole();
+                break;
             case 'Add Employee':
             case 'Update Employee Role':
 

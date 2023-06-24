@@ -18,18 +18,24 @@ const db = mysql.createConnection(
 
 
 function doAddDepartment() {
-
-    inquirer
-    .prompt(addDepartmentQuestion)
+    inquirer.prompt(addDepartmentQuestion)
     .then(data => {
-        switch (data.mainquestion){
+        const sql = `INSERT INTO departments (name) VALUES (?)`;
+        const params = [data.departmentname];
 
-            case 'Quit':
-                break;
-        }
-    })
-    
+        db.query(sql, params, function (err, results) {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log(`Added ${data.departmentname} to the departments table.`);
+                init();
+            }
+        });
+    });
 }
+
+
+
 function viewAllDepartment() {
     return new Promise((resolve, reject) => {
         db.query('SELECT * FROM departments', function (err, results) {
@@ -46,8 +52,8 @@ function viewAllDepartment() {
 function viewAllRole() {
     return new Promise((resolve, reject) => {
         const sql = `SELECT roles.id, roles.title, roles.salary, departments.name
-                     FROM roles, departments
-                     WHERE department_id = departments.id;`
+        FROM roles, departments
+        WHERE department_id = departments.id;`
         db.query(sql, function (err, results) {
             if (err) {
                 reject(err);
@@ -58,6 +64,32 @@ function viewAllRole() {
         });
     });
 }
+
+function viewAllEmployee() {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM 
+        (SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
+        departments.name, roles.salary, managername
+        FROM roles, departments, employees, 
+        (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
+        WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id)
+        UNION
+        SELECT employees.id, employees.firstname, employees.lastname, roles.title, departments.name, roles.salary, manager_id as managername
+        FROM roles, departments, (select * from employees where manager_id is null) AS employees 
+        WHERE department_id = departments.id and employees.role_id = roles.id) AS A
+        ORDER BY id;`
+        db.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+                console.table(results);
+                resolve();
+            }
+        });
+    });
+}
+
+
 
 // TODO: Create a function to initialize app
 function init() {
@@ -73,8 +105,9 @@ function init() {
             case 'View All Roles':
                 nextAction = viewAllRole();    
                 break;
-            //case 'View All Employees':
-
+            case 'View All Employees':
+                nextAction = viewAllEmployee();
+                break;
             case 'Add Department':
                 doAddDepartment();
                 break;

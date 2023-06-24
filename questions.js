@@ -79,10 +79,10 @@ const updateEmployeeQuestion = [
     {
         type: 'list',
         message: 'Which role do you want to assign the selected employee?',
-        name: 'employerole',
+        name: 'employeerole',
         choices: [ ],            
     },      
 
-]
+];
 
 module.exports = {mainQuestion, addDepartmentQuestion, addRoleQuestion, addEmployeeQuestion, updateEmployeeQuestion};

@@ -175,22 +175,55 @@ function doAddEmployee() {
 }
 
 
-/*function doAddRole() {
-    inquirer.prompt(addRoleQuestion)
-    .then(data => {
-        const sql = `INSERT INTO departments (name) VALUES (?)`;
-        const params = [data.departmentname];
+function doUpdateEmployeeRole() {
 
-        db.query(sql, params, function (err, results) {
+    db.query("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees", function(err, employees) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        console.log(employees);
+        let ids = employees.map(item => item.id);
+        let names = employees.map(item => item.name);
+        console.log(ids);
+        console.log(names);
+        updateEmployeeQuestion[0].choices = names;
+        
+        
+        db.query('SELECT id, title from roles', function(err, roles) {
             if (err) {
-                console.error(err);
-            } else {
-                console.log(`Added ${data.departmentname} to the departments table.`);
-                init();
+                console.log('Error: ' + err.message);
+                return;
             }
+
+            let rids = roles.map(item => item.id);
+            let rnames = roles.map(item => item.title);
+            updateEmployeeQuestion[1].choices = rnames;
+
+            inquirer.prompt(updateEmployeeQuestion)
+            .then(data => {
+                let employeeindex = names.indexOf(data.employeename);
+                let roleindex = rnames.indexOf(data.employeerole);
+                //console.log(names);
+                //console.log(rnames);
+                //console.log(employeeindex);
+                //console.log(roleindex);
+
+                const sql = `UPDATE employees SET role_id = ? WHERE id = ?`;
+                const params = [rids[roleindex], ids[employeeindex]];
+        
+                db.query(sql, params, function (err, results) {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        console.log(`Updated ${names[employeeindex]}  employee role`);
+                        init();
+                    }
+                });
+            });
         });
     });
-}*/
+}
 
 
 // TODO: Create a function to initialize app
@@ -220,7 +253,8 @@ function init() {
                 doAddEmployee();
                 break;
             case 'Update Employee Role':
-
+                doUpdateEmployeeRole();
+                break;
             case 'Quit':
                 return process.exit();                 
                 //break;

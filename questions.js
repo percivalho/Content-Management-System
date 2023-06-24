@@ -62,6 +62,12 @@ const addEmployeeQuestion = [
         name: 'employeerole',
         choices: [ ],      
     },    
+    {
+        type: 'list',
+        message: 'What is the employee\'s manager?',
+        name: 'managername',
+        choices: [ ],      
+    },        
 ];
 const updateEmployeeQuestion = [
     {

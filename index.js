@@ -107,7 +107,7 @@ function doAddRole() {
         inquirer.prompt(addRoleQuestion)
         .then(data => {
             console.log(data);
-            data.roledepartment
+            //data.roledepartment
             let index = names.indexOf(data.roledepartment);
             //console.log(ids[index]);
             // insert the new role to database here.
@@ -126,6 +126,53 @@ function doAddRole() {
     });
 }
 
+function doAddEmployee() {
+    db.query('SELECT * FROM roles', function(err, roles) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }
+
+        console.log(roles);
+        let rids = roles.map(item => item.id);
+        let rnames = roles.map(item => item.title);
+        console.log(rids);
+        console.log(rnames);
+        addEmployeeQuestion[2].choices = rnames;
+
+
+        db.query('SELECT id, CONCAT(firstname, " ", lastname) as manager from employees', function(err, managers) {
+            if (err) {
+                console.log('Error: ' + err.message);
+                return;
+            }
+
+            let mids = managers.map(item => item.id);
+            let mnames = managers.map(item => item.manager);
+            mids.unshift(null);
+            mnames.unshift("None");        
+            addEmployeeQuestion[3].choices = mnames;
+
+            inquirer.prompt(addEmployeeQuestion)
+            .then(data => {
+                let roleindex = rnames.indexOf(data.employeerole);
+                let managerindex = mnames.indexOf(data.managername);
+
+                const sql = `INSERT INTO employees (firstname, lastname, role_id, manager_id) VALUES (?, ?, ?, ?)`;
+                const params = [data.employeefirstname, data.employeelastname, rids[roleindex], mids[managerindex]];
+        
+                db.query(sql, params, function (err, results) {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        console.log(`Added ${data.employeefirstname} ${data.employeelastname}  to the employees table.`);
+                        init();
+                    }
+                });
+            });
+        });
+    });
+}
 
 
 /*function doAddRole() {
@@ -170,10 +217,13 @@ function init() {
                 doAddRole();
                 break;
             case 'Add Employee':
+                doAddEmployee();
+                break;
             case 'Update Employee Role':
 
             case 'Quit':
-                break;
+                return process.exit();                 
+                //break;
         }
         if (nextAction) {
             nextAction.then(init); // Call init() again once the selected operation is done

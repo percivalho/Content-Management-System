@@ -15,6 +15,7 @@ const mainQuestion = [
         'Update Employee Manager',
         'View Employee by Manager',
         'View Employee by Department',
+        'View Budget by Department',
         'Quit',
         ],      
     },

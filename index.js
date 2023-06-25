@@ -363,6 +363,29 @@ function doViewEmployeeByDepartment(){
 
 
 
+
+function doViewBudgetbyDepartment() {
+    return new Promise((resolve, reject) => {
+        const sql = `select a.name, sum(salary) as budget from 
+        (SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
+             departments.name, roles.salary, managername
+        FROM roles, departments, employees, 
+        (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
+        WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id)) as a
+        group by a.name;`
+        db.query(sql, function (err, results) {
+            if (err) {
+                reject(err);
+            } else {
+                console.table(results);
+                resolve();
+            }
+        });
+    });
+}
+
+
+
 // TODO: Create a function to initialize app
 function init() {
 
@@ -401,7 +424,10 @@ function init() {
             case 'View Employee by Department':
                 doViewEmployeeByDepartment();
                 break; 
-                case 'Quit':
+            case 'View Budget by Department':
+                doViewBudgetbyDepartment();
+                break; 
+            case 'Quit':
                 return process.exit();                 
                 //break;
         }

@@ -12,6 +12,8 @@ const mainQuestion = [
         'Add Role',
         'Add Employee',
         'Update Employee Role',
+        'Update Employee Manager',
+        'View Employee by Manager',
         'Quit',
         ],      
     },
@@ -85,4 +87,37 @@ const updateEmployeeQuestion = [
 
 ];
 
-module.exports = {mainQuestion, addDepartmentQuestion, addRoleQuestion, addEmployeeQuestion, updateEmployeeQuestion};
+const updateEmployeeManagerQuestion = [
+    {
+        type: 'list',
+        message: 'Which employee\'s role do you want to update?',
+        name: 'employeename',
+        choices: [ ],            
+    },      
+    {
+        type: 'list',
+        message: 'Which manager do you want to assign the selected employee?',
+        name: 'employeemanager',
+        choices: [ ],            
+    },      
+
+];
+
+const viewEmployeeByManagerQuestion = [
+    {
+      type: 'list',
+      message: 'What is the name of the manager?',
+      name: 'managername',
+      choices: [ ],            
+    },
+];
+
+module.exports = {
+    mainQuestion, 
+    addDepartmentQuestion, 
+    addRoleQuestion, 
+    addEmployeeQuestion, 
+    updateEmployeeQuestion, 
+    updateEmployeeManagerQuestion,
+    viewEmployeeByManagerQuestion
+  };

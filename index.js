@@ -1,7 +1,16 @@
 // TODO: Include packages needed for this application
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-const  {mainQuestion, addDepartmentQuestion, addRoleQuestion, addEmployeeQuestion, updateEmployeeQuestion} = require('./questions.js');
+const  {
+    mainQuestion, 
+    addDepartmentQuestion, 
+    addRoleQuestion, 
+    addEmployeeQuestion, 
+    updateEmployeeQuestion, 
+    updateEmployeeManagerQuestion,
+    viewEmployeeByManagerQuestion
+  } = require('./questions.js');
+  
 
 // Connect to database
 const db = mysql.createConnection(
@@ -225,6 +234,95 @@ function doUpdateEmployeeRole() {
     });
 }
 
+function doUpdateEmployeeManager() {
+    console.log("here");
+    db.query("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees", function(err, employees) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        console.log(employees);
+        let ids = employees.map(item => item.id);
+        let names = employees.map(item => item.name);
+        let mids = employees.map(item => item.id);
+        let mnames = employees.map(item => item.name);
+        console.log(ids);
+        console.log(names);
+        mids.unshift(null);
+        mnames.unshift("None");     
+
+        updateEmployeeManagerQuestion[0].choices = names;
+        updateEmployeeManagerQuestion[1].choices = mnames;
+        
+        
+
+        inquirer.prompt(updateEmployeeManagerQuestion)
+        .then(data => {
+            let managerindex = mnames.indexOf(data.employeemanager);
+            let index = names.indexOf(data.employeename);
+
+            const sql = `UPDATE employees SET manager_id = ? WHERE id = ?`;
+            const params = [mids[managerindex], ids[index]];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(`Updated ${names[index]}  employee manager`);
+                    init();
+                }
+            });
+        });
+    });
+}
+
+function doViewEmployeeByManager(){
+
+    const sql = `SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees
+    WHERE ID IN (select DISTINCT manager_id from employees where manager_id is NOT NULL);`;    
+    db.query(sql, function(err, managers) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        console.log(managers);
+        let mids = managers.map(item => item.id);
+        let mnames = managers.map(item => item.name);
+        console.log(mnames);
+        viewEmployeeByManagerQuestion[0].choices = mnames;
+        //console.log(viewEmployeeByManagerQuestion[0].choices);
+        //console.log(viewEmployeeByManagerQuestion[0]);
+        //console.log(viewEmployeeByManagerQuestion);
+        
+        
+
+        inquirer.prompt(viewEmployeeByManagerQuestion)
+        .then(data => {
+            let managerindex = mnames.indexOf(data.managername);
+
+            const sql = `SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
+            departments.name, roles.salary, managername
+            FROM roles, departments, employees, 
+            (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
+            WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id) 
+            and manager_id = ?`
+            const params = mids[managerindex];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.table(results);
+                    init();
+                }
+            });
+        });
+    });
+    
+}
+
+
+
 
 // TODO: Create a function to initialize app
 function init() {
@@ -255,6 +353,12 @@ function init() {
             case 'Update Employee Role':
                 doUpdateEmployeeRole();
                 break;
+            case 'Update Employee Manager':
+                doUpdateEmployeeManager();
+                break;
+            case 'View Employee by Manager':
+                doViewEmployeeByManager();
+                break; 
             case 'Quit':
                 return process.exit();                 
                 //break;

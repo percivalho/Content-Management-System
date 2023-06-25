@@ -14,6 +14,7 @@ const mainQuestion = [
         'Update Employee Role',
         'Update Employee Manager',
         'View Employee by Manager',
+        'View Employee by Department',
         'Quit',
         ],      
     },
@@ -112,6 +113,15 @@ const viewEmployeeByManagerQuestion = [
     },
 ];
 
+const viewEmployeeByDepartmentQuestion = [
+    {
+      type: 'list',
+      message: 'What is the name of the department?',
+      name: 'departmentname',
+      choices: [ ],            
+    },
+];
+
 module.exports = {
     mainQuestion, 
     addDepartmentQuestion, 
@@ -119,5 +129,6 @@ module.exports = {
     addEmployeeQuestion, 
     updateEmployeeQuestion, 
     updateEmployeeManagerQuestion,
-    viewEmployeeByManagerQuestion
+    viewEmployeeByManagerQuestion,
+    viewEmployeeByDepartmentQuestion
   };

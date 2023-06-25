@@ -8,7 +8,8 @@ const  {
     addEmployeeQuestion, 
     updateEmployeeQuestion, 
     updateEmployeeManagerQuestion,
-    viewEmployeeByManagerQuestion
+    viewEmployeeByManagerQuestion,
+    viewEmployeeByDepartmentQuestion
   } = require('./questions.js');
   
 
@@ -321,6 +322,44 @@ function doViewEmployeeByManager(){
     
 }
 
+function doViewEmployeeByDepartment(){
+
+    const sql = `SELECT id,  name FROM departments`;    
+    db.query(sql, function(err, departments) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        let ids = departments.map(item => item.id);
+        let names = departments.map(item => item.name);
+        viewEmployeeByDepartmentQuestion[0].choices = names;
+
+        inquirer.prompt(viewEmployeeByDepartmentQuestion)
+        .then(data => {
+            let index = names.indexOf(data.departmentname);
+
+            const sql = `SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
+            departments.name, roles.salary, managername
+            FROM roles, departments, employees, 
+            (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
+            WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id) 
+            and department_id = ?`
+            const params = ids[index];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.table(results);
+                    init();
+                }
+            });
+        });
+    });
+    
+}
+
+
 
 
 
@@ -359,7 +398,10 @@ function init() {
             case 'View Employee by Manager':
                 doViewEmployeeByManager();
                 break; 
-            case 'Quit':
+            case 'View Employee by Department':
+                doViewEmployeeByDepartment();
+                break; 
+                case 'Quit':
                 return process.exit();                 
                 //break;
         }

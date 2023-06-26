@@ -455,6 +455,40 @@ function doDeleteRole(){
 }
 
 
+
+function doDeleteEmployee(){
+
+    const sql = `SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees`;    
+    db.query(sql, function(err, employees) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        let ids = employees.map(item => item.id);
+        let names =employees.map(item => item.name);
+        deleteEmployeeQuestion[0].choices = names;
+
+        inquirer.prompt(deleteEmployeeQuestion)
+        .then(data => {
+            let index = names.indexOf(data.employeename);
+
+            const sql = `DELETE FROM employees WHERE id = ?`
+            const params = ids[index];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(`Deleted employee ${names[index]} `);
+                    init();
+                }
+            });
+        });
+    });
+    
+}
+
+
 // TODO: Create a function to initialize app
 function init() {
 
@@ -502,7 +536,10 @@ function init() {
             case 'Delete Role':
                 doDeleteRole();
                 break; 
-                    
+            case 'Delete Employee':
+                doDeleteEmployee();
+                break; 
+                        
             case 'Quit':
                 return process.exit();                 
                 //break;

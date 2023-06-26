@@ -111,7 +111,6 @@ function doAddRole() {
             console.log('Error: ' + err.message);
             return;
         }
-        console.log(departments);
         let ids = departments.map(item => item.id);
         let names = departments.map(item => item.name);
         addRoleQuestion[2].choices = names;
@@ -119,10 +118,7 @@ function doAddRole() {
         // Now, run the prompt with the updated questions
         inquirer.prompt(addRoleQuestion)
         .then(data => {
-            console.log(data);
-            //data.roledepartment
             let index = names.indexOf(data.roledepartment);
-            //console.log(ids[index]);
             // insert the new role to database here.
             const sql = `INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)`;
             const params = [data.rolename, data.rolesalary, ids[index]];
@@ -146,11 +142,8 @@ function doAddEmployee() {
             return;
         }
 
-        console.log(roles);
         let rids = roles.map(item => item.id);
         let rnames = roles.map(item => item.title);
-        console.log(rids);
-        console.log(rnames);
         addEmployeeQuestion[2].choices = rnames;
 
 
@@ -195,11 +188,8 @@ function doUpdateEmployeeRole() {
             console.log('Error: ' + err.message);
             return;
         }    
-        console.log(employees);
         let ids = employees.map(item => item.id);
         let names = employees.map(item => item.name);
-        console.log(ids);
-        console.log(names);
         updateEmployeeQuestion[0].choices = names;
         
         
@@ -217,10 +207,6 @@ function doUpdateEmployeeRole() {
             .then(data => {
                 let employeeindex = names.indexOf(data.employeename);
                 let roleindex = rnames.indexOf(data.employeerole);
-                //console.log(names);
-                //console.log(rnames);
-                //console.log(employeeindex);
-                //console.log(roleindex);
 
                 const sql = `UPDATE employees SET role_id = ? WHERE id = ?`;
                 const params = [rids[roleindex], ids[employeeindex]];
@@ -239,27 +225,21 @@ function doUpdateEmployeeRole() {
 }
 
 function doUpdateEmployeeManager() {
-    console.log("here");
     db.query("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees", function(err, employees) {
         if (err) {
             console.log('Error: ' + err.message);
             return;
         }    
-        console.log(employees);
         let ids = employees.map(item => item.id);
         let names = employees.map(item => item.name);
         let mids = employees.map(item => item.id);
         let mnames = employees.map(item => item.name);
-        console.log(ids);
-        console.log(names);
         mids.unshift(null);
         mnames.unshift("None");     
 
         updateEmployeeManagerQuestion[0].choices = names;
         updateEmployeeManagerQuestion[1].choices = mnames;
         
-        
-
         inquirer.prompt(updateEmployeeManagerQuestion)
         .then(data => {
             let managerindex = mnames.indexOf(data.employeemanager);
@@ -289,17 +269,10 @@ function doViewEmployeeByManager(){
             console.log('Error: ' + err.message);
             return;
         }    
-        console.log(managers);
         let mids = managers.map(item => item.id);
         let mnames = managers.map(item => item.name);
-        console.log(mnames);
         viewEmployeeByManagerQuestion[0].choices = mnames;
-        //console.log(viewEmployeeByManagerQuestion[0].choices);
-        //console.log(viewEmployeeByManagerQuestion[0]);
-        //console.log(viewEmployeeByManagerQuestion);
         
-        
-
         inquirer.prompt(viewEmployeeByManagerQuestion)
         .then(data => {
             let managerindex = mnames.indexOf(data.managername);
@@ -528,7 +501,7 @@ function init() {
                 doViewEmployeeByDepartment();
                 break; 
             case 'View Budget by Department':
-                doViewBudgetbyDepartment();
+                nextAction = doViewBudgetbyDepartment();
                 break; 
             case 'Delete Department':
                 doDeleteDepartment();

@@ -77,7 +77,7 @@ then run node index.js to invoke the content management system.
 ## Features
 
 The application is capable of the full functionality of Content Management System.
-Include the  following operations:
+Include the following operations:
 
 1.  View All Departments
 2.  View All Roles
@@ -94,9 +94,10 @@ Include the  following operations:
 13. Delete Role
 14. Delete Employee
 
+
 the walkthrough video is below:
 
-![WalkThrough Video](link_to_the_mov_file)
+![WalkThrough Video](https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV/view?usp=sharing)
 
 
 
@@ -124,7 +125,7 @@ Testing done on:
 
 Link to Video:
 
-https://note-taker-server-e16f72bce28f.herokuapp.com
+https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV/view?usp=sharing
 
 
 Link to GitHub repo:

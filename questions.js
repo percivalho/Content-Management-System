@@ -16,6 +16,9 @@ const mainQuestion = [
         'View Employee by Manager',
         'View Employee by Department',
         'View Budget by Department',
+        'Delete Department',
+        'Delete Role',
+        'Delete Employee',
         'Quit',
         ],      
     },
@@ -123,6 +126,34 @@ const viewEmployeeByDepartmentQuestion = [
     },
 ];
 
+const deleteDepartmentQuestion = [
+    {
+      type: 'list',
+      message: 'Which department to delete?',
+      name: 'departmentname',
+      choices: [ ],            
+    },
+];
+
+const deleteRoleQuestion = [
+    {
+      type: 'list',
+      message: 'Which role to delete?',
+      name: 'rolename',
+      choices: [ ],            
+    },
+];
+
+const deleteEmployeeQuestion = [
+    {
+      type: 'list',
+      message: 'Which employee to delete?',
+      name: 'employeename',
+      choices: [ ],            
+    },
+];
+
+
 module.exports = {
     mainQuestion, 
     addDepartmentQuestion, 
@@ -131,5 +162,8 @@ module.exports = {
     updateEmployeeQuestion, 
     updateEmployeeManagerQuestion,
     viewEmployeeByManagerQuestion,
-    viewEmployeeByDepartmentQuestion
+    viewEmployeeByDepartmentQuestion,
+    deleteDepartmentQuestion,
+    deleteRoleQuestion,
+    deleteEmployeeQuestion
   };

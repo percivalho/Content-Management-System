@@ -9,7 +9,10 @@ const  {
     updateEmployeeQuestion, 
     updateEmployeeManagerQuestion,
     viewEmployeeByManagerQuestion,
-    viewEmployeeByDepartmentQuestion
+    viewEmployeeByDepartmentQuestion,
+    deleteDepartmentQuestion,
+    deleteRoleQuestion,
+    deleteEmployeeQuestion    
   } = require('./questions.js');
   
 
@@ -386,6 +389,72 @@ function doViewBudgetbyDepartment() {
 
 
 
+function doDeleteDepartment(){
+
+    const sql = `SELECT id,  name FROM departments`;    
+    db.query(sql, function(err, departments) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        let ids = departments.map(item => item.id);
+        let names =departments.map(item => item.name);
+        deleteDepartmentQuestion[0].choices = names;
+
+        inquirer.prompt(deleteDepartmentQuestion)
+        .then(data => {
+            let index = names.indexOf(data.departmentname);
+
+            const sql = `DELETE FROM departments where id = ?`
+            const params = ids[index];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(`Deleted ${names[index]} department`);
+                    init();
+                }
+            });
+        });
+    });
+    
+}
+
+
+function doDeleteRole(){
+
+    const sql = `SELECT id,  title FROM roles`;    
+    db.query(sql, function(err, roles) {
+        if (err) {
+            console.log('Error: ' + err.message);
+            return;
+        }    
+        let ids = roles.map(item => item.id);
+        let names =roles.map(item => item.title);
+        deleteRoleQuestion[0].choices = names;
+
+        inquirer.prompt(deleteRoleQuestion)
+        .then(data => {
+            let index = names.indexOf(data.rolename);
+
+            const sql = `DELETE FROM roles WHERE id = ?`
+            const params = ids[index];
+    
+            db.query(sql, params, function (err, results) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(`Deleted role ${names[index]} `);
+                    init();
+                }
+            });
+        });
+    });
+    
+}
+
+
 // TODO: Create a function to initialize app
 function init() {
 
@@ -427,6 +496,13 @@ function init() {
             case 'View Budget by Department':
                 doViewBudgetbyDepartment();
                 break; 
+            case 'Delete Department':
+                doDeleteDepartment();
+                break; 
+            case 'Delete Role':
+                doDeleteRole();
+                break; 
+                    
             case 'Quit':
                 return process.exit();                 
                 //break;

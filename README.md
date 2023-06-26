@@ -97,7 +97,7 @@ Include the following operations:
 
 the walkthrough video is below:
 
-![WalkThrough Video](https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV/view?usp=sharing)
+<iframe src="https://vimeo.com/839858559?share=copy" width="1039" height="552" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 
 
 
@@ -125,7 +125,7 @@ Testing done on:
 
 Link to Video:
 
-https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV/view?usp=sharing
+https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV
 
 
 Link to GitHub repo:

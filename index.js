@@ -29,7 +29,9 @@ const db = mysql.createConnection(
     console.log(`Connected to the company_db database.`)
 );    
 
-
+/**
+ * Function to add a department to the database.
+ */
 function doAddDepartment() {
     inquirer.prompt(addDepartmentQuestion)
     .then(data => {
@@ -48,7 +50,9 @@ function doAddDepartment() {
 }
 
 
-
+/**
+ * Function to view all departments.
+ */
 function viewAllDepartment() {
     return new Promise((resolve, reject) => {
         db.query('SELECT * FROM departments', function (err, results) {
@@ -62,6 +66,9 @@ function viewAllDepartment() {
     });
 }
 
+/**
+ * Function to view all roles.
+ */
 function viewAllRole() {
     return new Promise((resolve, reject) => {
         const sql = `SELECT roles.id, roles.title, roles.salary, departments.name
@@ -79,7 +86,9 @@ function viewAllRole() {
 }
 
 
-
+/**
+ * Function to view all employees and then with many details bits like manager_name, role_name and department name.
+ */
 function viewAllEmployee() {
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM 
@@ -87,11 +96,11 @@ function viewAllEmployee() {
         departments.name, roles.salary, managername
         FROM roles, departments, employees, 
         (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
-        WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id)
+        WHERE department_id = departments.id AND employees.role_id = roles.id AND (manager.id = manager_id)
         UNION
-        SELECT employees.id, employees.firstname, employees.lastname, roles.title, departments.name, roles.salary, manager_id as managername
-        FROM roles, departments, (select * from employees where manager_id is null) AS employees 
-        WHERE department_id = departments.id and employees.role_id = roles.id) AS A
+        SELECT employees.id, employees.firstname, employees.lastname, roles.title, departments.name, roles.salary, manager_id AS managername
+        FROM roles, departments, (SELECT * FROM employees WHERE manager_id is null) AS employees 
+        WHERE department_id = departments.id AND employees.role_id = roles.id) AS A
         ORDER BY id;`
         db.query(sql, function (err, results) {
             if (err) {
@@ -104,6 +113,9 @@ function viewAllEmployee() {
     });
 }
 
+/**
+ * Function to add a new role to table roles.
+ */
 function doAddRole() {
     // Fetch departments from the database
     db.query('SELECT * FROM departments', function(err, departments) {
@@ -135,6 +147,9 @@ function doAddRole() {
     });
 }
 
+/**
+ * Function to add a new employee to table employees.
+ */
 function doAddEmployee() {
     db.query('SELECT * FROM roles', function(err, roles) {
         if (err) {
@@ -147,7 +162,7 @@ function doAddEmployee() {
         addEmployeeQuestion[2].choices = rnames;
 
 
-        db.query('SELECT id, CONCAT(firstname, " ", lastname) as manager from employees', function(err, managers) {
+        db.query('SELECT id, CONCAT(firstname, " ", lastname) AS manager FROM employees', function(err, managers) {
             if (err) {
                 console.log('Error: ' + err.message);
                 return;
@@ -180,10 +195,12 @@ function doAddEmployee() {
     });
 }
 
-
+/**
+ * Function to update an employee's role.
+ */
 function doUpdateEmployeeRole() {
 
-    db.query("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees", function(err, employees) {
+    db.query("SELECT id, CONCAT(firstname, ' ', lastname) AS name FROM employees", function(err, employees) {
         if (err) {
             console.log('Error: ' + err.message);
             return;
@@ -193,7 +210,7 @@ function doUpdateEmployeeRole() {
         updateEmployeeQuestion[0].choices = names;
         
         
-        db.query('SELECT id, title from roles', function(err, roles) {
+        db.query('SELECT id, title FROM roles', function(err, roles) {
             if (err) {
                 console.log('Error: ' + err.message);
                 return;
@@ -224,8 +241,11 @@ function doUpdateEmployeeRole() {
     });
 }
 
+/**
+ * Function to update employee's manager
+ */
 function doUpdateEmployeeManager() {
-    db.query("SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees", function(err, employees) {
+    db.query("SELECT id, CONCAT(firstname, ' ', lastname) AS name FROM employees", function(err, employees) {
         if (err) {
             console.log('Error: ' + err.message);
             return;
@@ -260,10 +280,13 @@ function doUpdateEmployeeManager() {
     });
 }
 
+/**
+ * Function to view all employees managed by particular manager.
+ */
 function doViewEmployeeByManager(){
 
-    const sql = `SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees
-    WHERE ID IN (select DISTINCT manager_id from employees where manager_id is NOT NULL);`;    
+    const sql = `SELECT id, CONCAT(firstname, ' ', lastname) AS name FROM employees
+    WHERE id IN (select DISTINCT manager_id FROM employees WHERE manager_id is NOT NULL);`;    
     db.query(sql, function(err, managers) {
         if (err) {
             console.log('Error: ' + err.message);
@@ -280,9 +303,9 @@ function doViewEmployeeByManager(){
             const sql = `SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
             departments.name, roles.salary, managername
             FROM roles, departments, employees, 
-            (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
-            WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id) 
-            and manager_id = ?`
+            (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') AS manager
+            WHERE department_id = departments.id AND employees.role_id = roles.id AND (manager.id = manager_id) 
+            AND manager_id = ?`
             const params = mids[managerindex];
     
             db.query(sql, params, function (err, results) {
@@ -298,6 +321,9 @@ function doViewEmployeeByManager(){
     
 }
 
+/**
+ * Function to view employees by department level.
+ */
 function doViewEmployeeByDepartment(){
 
     const sql = `SELECT id,  name FROM departments`;    
@@ -317,9 +343,9 @@ function doViewEmployeeByDepartment(){
             const sql = `SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
             departments.name, roles.salary, managername
             FROM roles, departments, employees, 
-            (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
-            WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id) 
-            and department_id = ?`
+            (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION SELECT null, '') AS manager
+            WHERE department_id = departments.id AND employees.role_id = roles.id AND (manager.id = manager_id) 
+            AND department_id = ?`
             const params = ids[index];
     
             db.query(sql, params, function (err, results) {
@@ -338,17 +364,18 @@ function doViewEmployeeByDepartment(){
 
 
 
-
-
+/**
+ * Function to view Budget of each development order by budget in desc order
+ */
 function doViewBudgetbyDepartment() {
     return new Promise((resolve, reject) => {
-        const sql = `select a.name, sum(salary) as budget from 
+        const sql = `SELECT a.name, sum(salary) AS budget FROM
         (SELECT employees.id, employees.firstname, employees.lastname, roles.title, 
              departments.name, roles.salary, managername
         FROM roles, departments, employees, 
-        (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION select null, '') as manager
-        WHERE department_id = departments.id and employees.role_id = roles.id and (manager.id = manager_id)) as a
-        group by a.name;`
+        (SELECT id, CONCAT(firstname, ' ', lastname) AS 'managername' FROM employees UNION SELECT null, '') AS manager
+        WHERE department_id = departments.id AND employees.role_id = roles.id AND (manager.id = manager_id)) AS a
+        GROUP BY a.name ORDER BY budget DESC;`
         db.query(sql, function (err, results) {
             if (err) {
                 reject(err);
@@ -361,7 +388,9 @@ function doViewBudgetbyDepartment() {
 }
 
 
-
+/**
+ * Function to delete a department.
+ */
 function doDeleteDepartment(){
 
     const sql = `SELECT id,  name FROM departments`;    
@@ -378,7 +407,7 @@ function doDeleteDepartment(){
         .then(data => {
             let index = names.indexOf(data.departmentname);
 
-            const sql = `DELETE FROM departments where id = ?`
+            const sql = `DELETE FROM departments WHERE id = ?`
             const params = ids[index];
     
             db.query(sql, params, function (err, results) {
@@ -394,7 +423,9 @@ function doDeleteDepartment(){
     
 }
 
-
+/**
+ * Function to delete a role.
+ */
 function doDeleteRole(){
 
     const sql = `SELECT id,  title FROM roles`;    
@@ -428,10 +459,12 @@ function doDeleteRole(){
 }
 
 
-
+/**
+ * Function to delete an employee
+ */
 function doDeleteEmployee(){
 
-    const sql = `SELECT id, CONCAT(firstname, ' ', lastname) as name FROM employees`;    
+    const sql = `SELECT id, CONCAT(firstname, ' ', lastname) AS name FROM employees`;    
     db.query(sql, function(err, employees) {
         if (err) {
             console.log('Error: ' + err.message);
@@ -462,7 +495,9 @@ function doDeleteEmployee(){
 }
 
 
-// TODO: Create a function to initialize app
+/**
+ * Init function upon calling
+ */
 function init() {
 
     inquirer

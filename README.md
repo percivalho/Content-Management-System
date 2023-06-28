@@ -130,7 +130,7 @@ https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV
 
 Link to GitHub repo:
 
-https://github.com/percivalho/Note-Taker-Server.git
+https://github.com/percivalho/Content-Management-System.git
 
 
 

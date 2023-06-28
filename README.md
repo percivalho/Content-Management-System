@@ -97,7 +97,7 @@ Include the following operations:
 
 the walkthrough video is below:
 
-[![Video Thumbnail](./Assets/screenshot.png)](https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV)
+[![Video Thumbnail](./assets/screenshot.png)](https://drive.google.com/file/d/1gfFAEWYA9bcTTQLpF_EbxCk9IaThEJYV)
 
 
 
